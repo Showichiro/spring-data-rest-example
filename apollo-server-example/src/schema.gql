@@ -1,0 +1,47 @@
+type Query {
+  users: [User]
+  companies: [Company]
+  user(id: ID!): User
+  company(id: ID!): Company
+}
+
+type Mutation {
+  createUser(user: UserInput): User
+  updateUser(user: UserInput): Response
+}
+
+type SuccessResponse {
+  success: Boolean!
+}
+
+type FailResponse {
+  success: Boolean!
+  message: String
+  error: String
+}
+
+union Response = SuccessResponse | FailResponse
+
+type User {
+  id: ID!
+  firstName: String
+  lastName: String
+  email: String
+  age: Int
+  companyCode: String
+  company: Company
+}
+
+type Company {
+  code: ID!
+  name: String
+}
+
+input UserInput {
+  userId: ID!
+  firstName: String
+  lastName: String
+  email: String
+  age: Int
+  companyCode: String
+}
