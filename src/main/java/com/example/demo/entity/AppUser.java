@@ -14,7 +14,7 @@ public class AppUser {
     @Id
     @Column(length = 6, nullable = false)
     private String userId;
-
+    
     private String firstName;
 
     private String lastName;

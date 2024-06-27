@@ -8,16 +8,18 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.rest.core.RepositoryConstraintViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.support.ETagDoesntMatchException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import lombok.extern.log4j.Log4j2;
+import com.example.demo.dto.ErrorResponse;
 
 @ControllerAdvice
-@Log4j2
 public class SpringDataRestExceptionHandler {
 
     @ExceptionHandler({
@@ -60,23 +62,50 @@ public class SpringDataRestExceptionHandler {
         return handleInternalServerError(e);
     }
 
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
     private ResponseEntity<?> handleNotFound(ResourceNotFoundException e) {
-        log.info(e.getMessage());
-        return ResponseEntity.notFound().build();
+        return ResponseEntity
+                .ok(ErrorResponse
+                        .builder()
+                        .code("NOT_FOUND")
+                        .message(e.getMessage())
+                        .build());
     }
 
     private ResponseEntity<?> handleBadRequest(Exception e) {
-        log.info(e.getMessage());
-        return ResponseEntity.badRequest().body("BadRequest");
+        if (e instanceof RepositoryConstraintViolationException ex) {
+            StringBuffer sb = new StringBuffer();
+            for (FieldError fieldError : ex.getErrors().getFieldErrors()) {
+                sb.append(fieldError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.builder().code("BAD_REQUEST")
+                            .message(
+                                    sb.toString())
+                            .build());
+        } else {
+
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.builder()
+                            .code("BAD_REQUEST")
+                            .message(e.getMessage())
+                            .build());
+        }
     }
 
     private ResponseEntity<?> handleConflict(Exception e) {
-        log.info(e.getMessage());
-        return ResponseEntity.status(409).body("Conflict");
+        return ResponseEntity.status(409).body(ErrorResponse.builder()
+                .code("CONFLICT")
+                .message(e.getMessage())
+                .build());
     }
 
     private ResponseEntity<?> handleInternalServerError(Exception e) {
-        log.error(e.getMessage(), e.getCause());
-        return ResponseEntity.internalServerError().body("Internal Server Error");
+        return ResponseEntity.internalServerError()
+                .body(ErrorResponse
+                        .builder()
+                        .code("INTERNAL_SERVER_ERROR")
+                        .message(e.getMessage())
+                        .build());
     }
 }
