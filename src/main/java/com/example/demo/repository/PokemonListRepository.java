@@ -2,7 +2,6 @@ package com.example.demo.repository;
 
 import java.util.List;
 
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
 import com.apollographql.apollo.ApolloClient;
@@ -12,7 +11,6 @@ import com.apollographql.apollo.rx3.Rx3Apollo;
 import pokemon.PokemonListQuery.Pokemon_v2_pokemon;
 
 @Repository
-@RepositoryRestResource(collectionResourceRel = "pokemon", path = "pokemons",  exported = true)
 public class PokemonListRepository {
     public List<Pokemon_v2_pokemon> getPokemonList() {
         final var apolloClient = ApolloClient.builder()
