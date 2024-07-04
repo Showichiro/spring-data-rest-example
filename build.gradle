@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id "com.apollographql.apollo" version "2.5.14"
 }
 
 group = 'com.example'
@@ -32,8 +33,19 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'com.oracle.database.jdbc:ojdbc11:21.14.0.0'
+	implementation 'com.apollographql.apollo:apollo-runtime:2.5.14'
+	implementation 'com.apollographql.apollo:apollo-rx3-support:2.5.14'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "$buildDir/generated/source/apollo/main"
+        }
+    }
 }

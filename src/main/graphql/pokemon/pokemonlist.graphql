@@ -1,0 +1,6 @@
+query PokemonList {
+    pokemon_v2_pokemon {
+        id
+        name
+    }
+}
